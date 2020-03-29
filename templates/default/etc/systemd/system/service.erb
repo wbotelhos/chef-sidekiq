@@ -1,0 +1,29 @@
+[Unit]
+After=syslog.target network.target
+Description=sidekiq
+
+[Service]
+Environment=LANG=<%= @locale %> LC_ALL=<%= @locale %> LANGUAGE=<%= @locale %> <%= "GEM_HOME=#{@gem_home}" %>
+Environment=MALLOC_ARENA_MAX=2
+
+<% "ExecReload=#{@kill} -TSTP $MAINPID" if @kill -%>
+ExecStart=<%= @bundle %> exec sidekiq -e production
+
+Restart=always
+RestartSec=1
+
+SyslogIdentifier=sidekiq
+StandardError=syslog
+StandardOutput=syslog
+
+Type=<%= @type %>
+<% "WatchdogSec=#{@watchdogsec}" if @watchdogsec -%>
+
+User=<%= @user %>
+Group=<%= @group %>
+UMask=0002
+
+WorkingDirectory=<%= @working_directory %>
+
+[Install]
+WantedBy=multi-user.target
